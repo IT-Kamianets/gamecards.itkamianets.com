@@ -1,0 +1,18 @@
+<div class="login-page">
+	<div class="login-card">
+		<h1>🃏 Дурак</h1>
+		<p>Введи свій нікнейм щоб почати</p>
+
+		<input
+			type="text"
+			placeholder="Нікнейм"
+			[ngModel]="name()"
+			(ngModelChange)="name.set($event)"
+			(keyup.enter)="submit()"
+		/>
+
+		<button (click)="submit()" [disabled]="loading()">
+			{{ loading() ? 'Завантаження...' : 'Грати' }}
+		</button>
+	</div>
+</div>

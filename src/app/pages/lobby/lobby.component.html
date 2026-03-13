@@ -1,0 +1,38 @@
+<div class="lobby-page">
+	<header>
+		<h1>🃏 Дурак</h1>
+		<div class="user-info">
+			<span>{{ _auth.user()?.name }}</span>
+			<button class="logout-btn" (click)="logout()">Вийти</button>
+		</div>
+	</header>
+
+	<div class="content">
+		<div class="actions">
+			<button class="create-btn" (click)="createGame()">+ Створити гру</button>
+			<button class="refresh-btn" (click)="loadGames()">🔄 Оновити</button>
+		</div>
+
+		@if (loading()) {
+			<div class="loading">Завантаження...</div>
+		} @else if (games().length === 0) {
+			<div class="empty">Немає активних ігор. Створи першу!</div>
+		} @else {
+			<div class="games-list">
+				@for (game of games(); track game._id) {
+					<div class="game-card">
+						<div class="game-info">
+							<span class="creator">{{ game.creator.name }}</span>
+							<span class="players">
+								👥 {{ game.players.length }} / {{ game.maxPlayers }}
+							</span>
+						</div>
+						<span class="status" [class]="game.status">
+							{{ game.status }}
+						</span>
+					</div>
+				}
+			</div>
+		}
+	</div>
+</div>
