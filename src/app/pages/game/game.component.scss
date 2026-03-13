@@ -1,0 +1,175 @@
+.game-page {
+	min-height: 100vh;
+	background: radial-gradient(ellipse at center, #1a5c2a 0%, #0d2b13 100%);
+	color: white;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 32px;
+	background: rgba(0, 0, 0, 0.4);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+	h1 {
+		font-size: 1.5rem;
+		margin: 0;
+	}
+
+	.back-btn {
+		padding: 8px 16px;
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: transparent;
+		color: white;
+		cursor: pointer;
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.1);
+		}
+	}
+
+	.status {
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 0.85rem;
+		font-weight: 600;
+
+		&.lobby {
+			background: rgba(76, 175, 80, 0.2);
+			color: #4caf50;
+		}
+
+		&.running {
+			background: rgba(255, 152, 0, 0.2);
+			color: #ff9800;
+		}
+
+		&.finished {
+			background: rgba(255, 255, 255, 0.1);
+			color: rgba(255, 255, 255, 0.4);
+		}
+	}
+}
+
+.loading {
+	text-align: center;
+	color: rgba(255, 255, 255, 0.5);
+	padding: 48px;
+	font-size: 1.1rem;
+}
+
+.content {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 32px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.info-panel {
+	display: flex;
+	gap: 24px;
+}
+
+.players {
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	padding: 20px;
+	flex: 1;
+
+	h3 {
+		margin: 0 0 16px;
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.85rem;
+		text-transform: uppercase;
+	}
+
+	.player {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		font-size: 1.1rem;
+
+		&.active {
+			color: #ff9800;
+		}
+
+		.crown {
+			font-size: 0.85rem;
+		}
+
+		.turn {
+			font-size: 0.75rem;
+			color: #ff9800;
+			margin-left: auto;
+		}
+	}
+}
+
+.trump {
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	padding: 20px;
+	text-align: center;
+
+	h3 {
+		margin: 0 0 16px;
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.85rem;
+		text-transform: uppercase;
+	}
+
+	.trump-card {
+		font-size: 2.5rem;
+	}
+}
+
+.actions {
+	display: flex;
+	gap: 12px;
+
+	button {
+		padding: 12px 24px;
+		border-radius: 8px;
+		border: none;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.join-btn {
+		background: #2196f3;
+		color: white;
+
+		&:hover {
+			background: #1e88e5;
+		}
+	}
+
+	.start-btn {
+		background: #4caf50;
+		color: white;
+
+		&:hover {
+			background: #43a047;
+		}
+	}
+
+	.refresh-btn {
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		border: 1px solid rgba(255, 255, 255, 0.2) !important;
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.2);
+		}
+	}
+}

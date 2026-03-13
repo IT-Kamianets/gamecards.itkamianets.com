@@ -20,7 +20,7 @@
 		} @else {
 			<div class="games-list">
 				@for (game of games(); track game._id) {
-					<div class="game-card">
+					<div class="game-card" (click)="_router.navigate(['/game', game._id])">
 						<div class="game-info">
 							<span class="creator">{{ game.creator.name }}</span>
 							<span class="players">

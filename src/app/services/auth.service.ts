@@ -7,17 +7,20 @@ export class AuthService {
 	private _apiUrl = 'https://api.webart.work/api/cardgame';
 
 	token = signal<string | null>(localStorage.getItem('token'));
-	user = signal<{ name: string } | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+	user = signal<{ _id?: string; name: string } | null>(
+		JSON.parse(localStorage.getItem('user') || 'null'),
+	);
 
 	login(name: string) {
 		return this._http.post<string>(`${this._apiUrl}/token`, { name });
 	}
 
 	saveToken(token: string, name: string) {
+		const payload = JSON.parse(atob(token.split('.')[1]));
 		localStorage.setItem('token', token);
-		localStorage.setItem('user', JSON.stringify({ name }));
+		localStorage.setItem('user', JSON.stringify({ _id: payload._id, name }));
 		this.token.set(token);
-		this.user.set({ name });
+		this.user.set({ _id: payload._id, name });
 	}
 
 	logout() {

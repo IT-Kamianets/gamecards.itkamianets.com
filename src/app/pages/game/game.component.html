@@ -1,0 +1,52 @@
+<div class="game-page">
+	<header>
+		<button class="back-btn" (click)="backToLobby()">← Лобі</button>
+		<h1>🃏 Дурак</h1>
+		<span class="status" [class]="game()?.status">
+			{{ game()?.status }}
+		</span>
+	</header>
+
+	@if (loading()) {
+		<div class="loading">Завантаження...</div>
+	} @else if (game()) {
+		<div class="content">
+			<div class="info-panel">
+				<div class="players">
+					<h3>Гравці</h3>
+					@for (player of game()!.players; track player._id) {
+						<div class="player" [class.active]="game()!.data?.turn === player._id">
+							{{ player.name }}
+							@if (game()!.creator._id === player._id) {
+								<span class="crown">👑</span>
+							}
+							@if (game()!.data?.turn === player._id) {
+								<span class="turn">← хід</span>
+							}
+						</div>
+					}
+				</div>
+
+				@if (game()!.data?.trump) {
+					<div class="trump">
+						<h3>Козир</h3>
+						<span class="trump-card">{{ game()!.data!.trump }}</span>
+					</div>
+				}
+			</div>
+
+			<div class="actions">
+				@if (!isPlayer() && game()!.status === 'lobby') {
+					<button class="join-btn" (click)="joinGame()">Приєднатись</button>
+				}
+
+				@if (isCreator() && game()!.status === 'lobby' && game()!.players.length >= 2) {
+					<button class="start-btn" (click)="startGame()">Почати гру</button>
+				}
+
+				<button class="refresh-btn" (click)="loadGame()">🔄 Оновити</button>
+			</div>
+		</div>
+	}
+</div>
+<p>game works!</p>

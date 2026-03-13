@@ -21,7 +21,7 @@ interface Game {
 export class LobbyComponent implements OnInit {
 	private _http = inject(HttpClient);
 	protected _auth = inject(AuthService);
-	private _router = inject(Router);
+	protected _router = inject(Router);
 
 	private _apiUrl = 'https://api.webart.work/api/cardgame';
 
