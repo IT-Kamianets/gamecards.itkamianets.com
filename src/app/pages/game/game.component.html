@@ -2,51 +2,128 @@
 	<header>
 		<button class="back-btn" (click)="backToLobby()">← Лобі</button>
 		<h1>🃏 Дурак</h1>
-		<span class="status" [class]="game()?.status">
-			{{ game()?.status }}
+		<span class="status" [class]="game()?.status ?? ''">
+			{{ game()?.status ?? '' }}
 		</span>
 	</header>
 
 	@if (loading()) {
 		<div class="loading">Завантаження...</div>
-	} @else if (game()) {
+	} @else if (game(); as currentGame) {
 		<div class="content">
-			<div class="info-panel">
-				<div class="players">
-					<h3>Гравці</h3>
-					@for (player of game()!.players; track player._id) {
-						<div class="player" [class.active]="game()!.data?.turn === player._id">
-							{{ player.name }}
-							@if (game()!.creator._id === player._id) {
-								<span class="crown">👑</span>
+			<!-- Лобі -->
+			@if (currentGame.status === 'lobby') {
+				<div class="info-panel">
+					<div class="players">
+						<h3>Гравці</h3>
+						@for (player of currentGame.players; track player._id) {
+							<div class="player">
+								{{ player.name }}
+								@if (currentGame.creator._id === player._id) {
+									<span class="crown">👑</span>
+								}
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="actions">
+					@if (!isPlayer() && currentGame.players.length < currentGame.maxPlayers) {
+						<button class="join-btn" (click)="joinGame()">Приєднатись</button>
+					}
+
+					@if (isCreator() && currentGame.players.length >= 2) {
+						<button class="start-btn" (click)="startGame()">Почати гру</button>
+					}
+
+					<button class="refresh-btn" (click)="loadGame()">🔄 Оновити</button>
+				</div>
+			}
+
+			<!-- Гра запущена -->
+			@if (currentGame.status === 'running') {
+				<div class="game-area">
+					<!-- Стіл -->
+					<div class="table">
+						<div class="table-info">
+							<div class="trump-mini">
+								Козир:
+								<span class="card">{{ currentGame.data?.trump ?? '?' }}</span>
+							</div>
+							<div class="deck">
+								Колода: {{ currentGame.data?.table?.length ?? 0 }} карт на столі
+							</div>
+						</div>
+
+						<!-- Карти на столі -->
+						<div class="table-cards">
+							@if (currentGame.data?.table; as tableCards) {
+								@if (tableCards.length > 0) {
+									@for (pair of tableCards; track $index) {
+										<div class="card-pair">
+											<div class="card attack">{{ pair.attack }}</div>
+											@if (pair.defend) {
+												<div class="card defend">{{ pair.defend }}</div>
+											} @else {
+												<div class="card empty">?</div>
+											}
+										</div>
+									}
+								} @else {
+									<div class="empty-table">Стіл порожній</div>
+								}
+							} @else {
+								<div class="empty-table">Стіл порожній</div>
 							}
-							@if (game()!.data?.turn === player._id) {
-								<span class="turn">← хід</span>
+						</div>
+
+						<!-- Інфо про гравців -->
+						<div class="players-status">
+							@for (player of currentGame.players; track player._id) {
+								<div
+									class="player-status"
+									[class.attacker]="currentGame.data?.attacker === player._id"
+									[class.defender]="currentGame.data?.defender === player._id"
+								>
+									<span class="name">{{ player.name }}</span>
+									@if (currentGame.data?.attacker === player._id) {
+										<span class="role">⚔️ Атакує</span>
+									}
+									@if (currentGame.data?.defender === player._id) {
+										<span class="role">🛡️ Захищається</span>
+									}
+								</div>
 							}
+						</div>
+					</div>
+
+					<!-- Мої карти -->
+					@if (isPlayer()) {
+						<div class="my-hand">
+							<h3>Твої карти</h3>
+							<div class="cards">
+								@for (card of myCards(); track $index) {
+									<div class="card">{{ card }}</div>
+								}
+							</div>
 						</div>
 					}
 				</div>
+			}
 
-				@if (game()!.data?.trump) {
-					<div class="trump">
-						<h3>Козир</h3>
-						<span class="trump-card">{{ game()!.data!.trump }}</span>
-					</div>
-				}
-			</div>
-
-			<div class="actions">
-				@if (!isPlayer() && game()!.status === 'lobby') {
-					<button class="join-btn" (click)="joinGame()">Приєднатись</button>
-				}
-
-				@if (isCreator() && game()!.status === 'lobby' && game()!.players.length >= 2) {
-					<button class="start-btn" (click)="startGame()">Почати гру</button>
-				}
-
-				<button class="refresh-btn" (click)="loadGame()">🔄 Оновити</button>
-			</div>
+			<!-- Гра закінчена -->
+			@if (currentGame.status === 'finished') {
+				<div class="game-over">
+					<h2>Гра закінчена!</h2>
+					@if (currentGame.data?.loser; as loserId) {
+						<p>
+							Дурак:
+							{{ currentGame.players.find((p) => p._id === loserId)?.name ?? 'Невідомий' }}
+						</p>
+					}
+					<button class="back-btn" (click)="backToLobby()">Повернутись в лобі</button>
+				</div>
+			}
 		</div>
 	}
 </div>
-<p>game works!</p>

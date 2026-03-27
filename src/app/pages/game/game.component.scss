@@ -173,3 +173,177 @@ header {
 		}
 	}
 }
+.game-area {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+
+.table {
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 16px;
+	padding: 24px;
+}
+
+.table-info {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+	.trump-mini {
+		font-size: 1.1rem;
+		color: rgba(255, 255, 255, 0.8);
+
+		.card {
+			font-size: 1.5rem;
+			margin-left: 8px;
+		}
+	}
+
+	.deck {
+		color: rgba(255, 255, 255, 0.5);
+		font-size: 0.95rem;
+	}
+}
+
+.table-cards {
+	min-height: 120px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	justify-content: center;
+	padding: 16px 0;
+}
+
+.card-pair {
+	display: flex;
+	gap: 8px;
+	position: relative;
+}
+
+.card {
+	background: white;
+	color: #000;
+	border-radius: 8px;
+	padding: 12px 16px;
+	font-size: 1.8rem;
+	font-weight: 600;
+	min-width: 60px;
+	text-align: center;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+	transition: transform 0.2s;
+
+	&.attack {
+		border: 2px solid #ff5252;
+	}
+
+	&.defend {
+		border: 2px solid #4caf50;
+		margin-left: -20px;
+		transform: translateY(-10px);
+	}
+
+	&.empty {
+		background: rgba(255, 255, 255, 0.1);
+		color: rgba(255, 255, 255, 0.3);
+		border: 2px dashed rgba(255, 255, 255, 0.2);
+	}
+}
+
+.empty-table {
+	text-align: center;
+	color: rgba(255, 255, 255, 0.3);
+	padding: 32px;
+	font-size: 1.1rem;
+}
+
+.players-status {
+	display: flex;
+	gap: 16px;
+	margin-top: 24px;
+	flex-wrap: wrap;
+}
+
+.player-status {
+	flex: 1;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	padding: 12px 16px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	&.attacker {
+		border-color: #ff5252;
+		background: rgba(255, 82, 82, 0.1);
+	}
+
+	&.defender {
+		border-color: #2196f3;
+		background: rgba(33, 150, 243, 0.1);
+	}
+
+	.name {
+		font-weight: 600;
+		font-size: 1.05rem;
+	}
+
+	.role {
+		font-size: 0.85rem;
+		color: rgba(255, 255, 255, 0.7);
+	}
+}
+
+.my-hand {
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 16px;
+	padding: 24px;
+
+	h3 {
+		margin: 0 0 16px;
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.85rem;
+		text-transform: uppercase;
+	}
+
+	.cards {
+		display: flex;
+		gap: 12px;
+		flex-wrap: wrap;
+		justify-content: center;
+
+		.card {
+			cursor: pointer;
+
+			&:hover {
+				transform: translateY(-8px);
+			}
+		}
+	}
+}
+
+.game-over {
+	text-align: center;
+	padding: 48px;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 16px;
+
+	h2 {
+		font-size: 2rem;
+		margin-bottom: 24px;
+		color: #ff9800;
+	}
+
+	p {
+		font-size: 1.2rem;
+		margin-bottom: 32px;
+		color: rgba(255, 255, 255, 0.8);
+	}
+}
