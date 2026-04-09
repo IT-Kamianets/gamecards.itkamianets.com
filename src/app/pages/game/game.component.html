@@ -3,107 +3,213 @@
 		<button class="back-btn" (click)="backToLobby()">← Лобі</button>
 		<h1>🃏 Дурак</h1>
 		<span class="status" [class]="game()?.status ?? ''">
-			{{ game()?.status ?? '' }}
+			{{
+				game()?.status === 'lobby'
+					? 'Лобі'
+					: game()?.status === 'running'
+						? 'Гра'
+						: 'Завершено'
+			}}
 		</span>
 	</header>
 
 	@if (loading()) {
-		<div class="loading">Завантаження...</div>
-	} @else if (game(); as currentGame) {
+		<div class="loading">
+			<div class="spinner"></div>
+			Завантаження...
+		</div>
+	} @else if (game(); as g) {
 		<div class="content">
-			<!-- Лобі -->
-			@if (currentGame.status === 'lobby') {
-				<div class="info-panel">
-					<div class="players">
-						<h3>Гравці</h3>
-						@for (player of currentGame.players; track player._id) {
-							<div class="player">
-								{{ player.name }}
-								@if (currentGame.creator._id === player._id) {
+			<!-- ══════════════ ЛОБІ ══════════════ -->
+			@if (g.status === 'lobby') {
+				<div class="lobby-area">
+					<div class="lobby-players">
+						<h3>Гравці ({{ g.players.length }} / {{ g.maxPlayers }})</h3>
+						@for (player of g.players; track player._id) {
+							<div class="lobby-player">
+								<span class="dot"></span>
+								<span>{{ player.name }}</span>
+								@if (g.creator._id === player._id) {
 									<span class="crown">👑</span>
 								}
 							</div>
 						}
+						@if (g.players.length < g.maxPlayers) {
+							@for (
+								i of [].constructor(g.maxPlayers - g.players.length);
+								track $index
+							) {
+								<div class="lobby-player empty">
+									<span class="dot empty"></span>
+									<span>Чекаємо гравця...</span>
+								</div>
+							}
+						}
 					</div>
-				</div>
 
-				<div class="actions">
-					@if (!isPlayer() && currentGame.players.length < currentGame.maxPlayers) {
-						<button class="join-btn" (click)="joinGame()">Приєднатись</button>
-					}
-
-					@if (isCreator() && currentGame.players.length >= 2) {
-						<button class="start-btn" (click)="startGame()">Почати гру</button>
-					}
-
-					<button class="refresh-btn" (click)="loadGame()">🔄 Оновити</button>
+					<div class="lobby-actions">
+						@if (!isPlayer() && g.players.length < g.maxPlayers) {
+							<button class="btn btn-join" (click)="joinGame()">Приєднатись</button>
+						}
+						@if (isCreator() && g.players.length >= 2) {
+							<button class="btn btn-start" (click)="startGame()">
+								🚀 Почати гру
+							</button>
+						} @else if (isCreator()) {
+							<p class="hint">Чекаємо ще одного гравця</p>
+						} @else if (isPlayer()) {
+							<p class="hint">Чекаємо коли хост почне гру</p>
+						}
+						<button class="btn btn-refresh" (click)="loadGame()">🔄 Оновити</button>
+					</div>
 				</div>
 			}
 
-			<!-- Гра запущена -->
-			@if (currentGame.status === 'running') {
+			<!-- ══════════════ ГРА ══════════════ -->
+			@if (g.status === 'running') {
 				<div class="game-area">
-					<!-- Стіл -->
-					<div class="table">
-						<div class="table-info">
-							<div class="trump-mini">
-								Козир:
-								<span class="card">{{ currentGame.data?.trump ?? '?' }}</span>
-							</div>
-							<div class="deck">
-								Колода: {{ currentGame.data?.table?.length ?? 0 }} карт на столі
-							</div>
+					<!-- Верхня панель: козир + колода + статус -->
+					<div class="top-bar">
+						<div class="trump-block">
+							<span class="label">Козир</span>
+							<span
+								class="trump-card"
+								[class.red]="cardColor(g.data?.trump ?? '') === 'red'"
+							>
+								{{ g.data?.trump ?? '?' }}
+							</span>
 						</div>
 
-						<!-- Карти на столі -->
-						<div class="table-cards">
-							@if (currentGame.data?.table; as tableCards) {
-								@if (tableCards.length > 0) {
-									@for (pair of tableCards; track $index) {
-										<div class="card-pair">
-											<div class="card attack">{{ pair.attack }}</div>
-											@if (pair.defend) {
-												<div class="card defend">{{ pair.defend }}</div>
-											} @else {
-												<div class="card empty">?</div>
-											}
-										</div>
-									}
+						<div class="round-status">
+							@if (isAttacker()) {
+								<span class="badge attack-badge">⚔️ Твій хід — атакуй!</span>
+							} @else if (isDefender()) {
+								@if (defendMode()) {
+									<span class="badge defend-badge">
+										🛡️ Вибери карту на столі щоб відбити
+										<button class="cancel-btn" (click)="cancelDefendSelect()">
+											✕
+										</button>
+									</span>
 								} @else {
-									<div class="empty-table">Стіл порожній</div>
+									<span class="badge defend-badge">🛡️ Ти захищаєшся</span>
 								}
 							} @else {
-								<div class="empty-table">Стіл порожній</div>
+								<span class="badge wait-badge">⏳ Чекай ходу</span>
 							}
 						</div>
 
-						<!-- Інфо про гравців -->
-						<div class="players-status">
-							@for (player of currentGame.players; track player._id) {
-								<div
-									class="player-status"
-									[class.attacker]="currentGame.data?.attacker === player._id"
-									[class.defender]="currentGame.data?.defender === player._id"
-								>
-									<span class="name">{{ player.name }}</span>
-									@if (currentGame.data?.attacker === player._id) {
-										<span class="role">⚔️ Атакує</span>
-									}
-									@if (currentGame.data?.defender === player._id) {
-										<span class="role">🛡️ Захищається</span>
-									}
-								</div>
+						<div class="deck-block">
+							<span class="label">Скид/Колода</span>
+							<span class="deck-count"
+								>{{ g.data?.discard?.length ?? 0 }} /
+								{{ g.data?.table?.length ?? 0 }}</span
+							>
+						</div>
+					</div>
+
+					<!-- Гравці -->
+					<div class="players-row">
+						@for (player of g.players; track player._id) {
+							<div
+								class="player-chip"
+								[class.is-attacker]="g.data?.attacker === player._id"
+								[class.is-defender]="g.data?.defender === player._id"
+								[class.is-me]="player._id === myId"
+							>
+								<span class="player-name">{{ player.name }}</span>
+								@if (g.data?.attacker === player._id) {
+									<span class="role-tag attack">⚔️</span>
+								}
+								@if (g.data?.defender === player._id) {
+									<span class="role-tag defend">🛡️</span>
+								}
+								@if (player._id === myId) {
+									<span class="me-tag">ти</span>
+								}
+							</div>
+						}
+					</div>
+
+					<!-- Стіл -->
+					<div class="table-area">
+						<div class="table-label">Стіл</div>
+						<div class="table-cards">
+							@if ((g.data?.table?.length ?? 0) === 0) {
+								<div class="empty-table">Стіл порожній — атакуй!</div>
+							} @else {
+								@for (pair of g.data!.table!; track $index) {
+									<div class="card-pair">
+										<!-- Атакуюча карта: клікабельна для захисника -->
+										<div
+											class="card table-card attack-card"
+											[class.red]="cardColor(pair.attack) === 'red'"
+											[class.trump]="isTrumpSuit(pair.attack)"
+											[class.clickable]="
+												isDefender() && defendMode() && !pair.defend
+											"
+											(click)="onAttackCardClick(pair.attack)"
+										>
+											<span class="card-value">{{ pair.attack }}</span>
+										</div>
+
+										@if (pair.defend) {
+											<div
+												class="card table-card defend-card"
+												[class.red]="cardColor(pair.defend) === 'red'"
+												[class.trump]="isTrumpSuit(pair.defend)"
+											>
+												<span class="card-value">{{ pair.defend }}</span>
+											</div>
+										} @else {
+											<div class="card table-card empty-slot">
+												<span>?</span>
+											</div>
+										}
+									</div>
+								}
 							}
 						</div>
 					</div>
+
+					<!-- Кнопки дій -->
+					@if (isMyTurn()) {
+						<div class="action-btns">
+							@if (isDefender() && hasOpenAttacks()) {
+								<button class="btn btn-take" (click)="take()">
+									😔 Взяти карти
+								</button>
+							}
+							@if (allDefended() && (isAttacker() || isDefender())) {
+								<button class="btn btn-done" (click)="done()">✅ Готово</button>
+							}
+						</div>
+					}
 
 					<!-- Мої карти -->
 					@if (isPlayer()) {
 						<div class="my-hand">
-							<h3>Твої карти</h3>
-							<div class="cards">
+							<div class="hand-label">
+								Твої карти ({{ myCards().length }})
+								@if (defendMode()) {
+									<span class="hint-inline"> — вибери карту для захисту</span>
+								}
+							</div>
+							<div class="hand-cards">
 								@for (card of myCards(); track $index) {
-									<div class="card">{{ card }}</div>
+									<div
+										class="card hand-card"
+										[class.red]="cardColor(card) === 'red'"
+										[class.trump]="isTrumpSuit(card)"
+										[class.selected]="selectedCard() === card"
+										[class.clickable]="isMyTurn()"
+										(click)="onHandCardClick(card)"
+									>
+										<span class="card-value">{{ card }}</span>
+									</div>
+								}
+								@if (myCards().length === 0) {
+									<div class="no-cards">Немає карт</div>
 								}
 							</div>
 						</div>
@@ -111,17 +217,22 @@
 				</div>
 			}
 
-			<!-- Гра закінчена -->
-			@if (currentGame.status === 'finished') {
+			<!-- ══════════════ КІНЕЦЬ ══════════════ -->
+			@if (g.status === 'finished') {
 				<div class="game-over">
-					<h2>Гра закінчена!</h2>
-					@if (currentGame.data?.loser; as loserId) {
-						<p>
-							Дурак:
-							{{ currentGame.players.find((p) => p._id === loserId)?.name ?? 'Невідомий' }}
-						</p>
+					<div class="game-over-icon">🃏</div>
+					<h2>Гра завершена!</h2>
+					@if (g.data?.loser; as loserId) {
+						@if (loserId === myId) {
+							<p class="loser-text">Ти — <strong>Дурак</strong> 😅</p>
+						} @else {
+							<p class="winner-text">Ти переміг! 🏆</p>
+							<p class="loser-sub">Дурак: {{ playerName(loserId) }}</p>
+						}
 					}
-					<button class="back-btn" (click)="backToLobby()">Повернутись в лобі</button>
+					<button class="btn btn-start" (click)="backToLobby()">
+						Повернутись в лобі
+					</button>
 				</div>
 			}
 		</div>

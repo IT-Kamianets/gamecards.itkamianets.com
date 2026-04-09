@@ -1,349 +1,579 @@
+// ─── Variables ───────────────────────────────────────────────────────────────
+$green-dark: #0d2b13;
+$green-mid: #1a5c2a;
+$card-bg: #fffdf5;
+$card-red: #c0392b;
+$card-black: #1a1a2e;
+$trump-glow: #f1c40f;
+$attack-color: #e74c3c;
+$defend-color: #2980b9;
+$selected-color: #f39c12;
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 .game-page {
 	min-height: 100vh;
-	background: radial-gradient(ellipse at center, #1a5c2a 0%, #0d2b13 100%);
+	background: radial-gradient(ellipse at 60% 40%, #1a5c2a 0%, #0d2b13 70%, #060f08 100%);
 	color: white;
+	font-family: 'Georgia', serif;
+	display: flex;
+	flex-direction: column;
 }
 
+// ─── Header ──────────────────────────────────────────────────────────────────
 header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 16px 32px;
-	background: rgba(0, 0, 0, 0.4);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	padding: 14px 28px;
+	background: rgba(0, 0, 0, 0.5);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	backdrop-filter: blur(8px);
 
 	h1 {
-		font-size: 1.5rem;
 		margin: 0;
+		font-size: 1.4rem;
+		letter-spacing: 0.05em;
 	}
 
 	.back-btn {
-		padding: 8px 16px;
-		border-radius: 8px;
+		padding: 7px 16px;
+		border-radius: 6px;
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		background: transparent;
-		color: white;
+		color: rgba(255, 255, 255, 0.7);
 		cursor: pointer;
-
+		font-size: 0.9rem;
+		transition: all 0.2s;
 		&:hover {
-			background: rgba(255, 255, 255, 0.1);
+			background: rgba(255, 255, 255, 0.08);
+			color: white;
 		}
 	}
 
 	.status {
-		padding: 4px 12px;
+		padding: 4px 14px;
 		border-radius: 20px;
-		font-size: 0.85rem;
-		font-weight: 600;
-
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		&.lobby {
 			background: rgba(76, 175, 80, 0.2);
-			color: #4caf50;
+			color: #81c784;
 		}
-
 		&.running {
 			background: rgba(255, 152, 0, 0.2);
-			color: #ff9800;
+			color: #ffb74d;
 		}
-
 		&.finished {
-			background: rgba(255, 255, 255, 0.1);
+			background: rgba(255, 255, 255, 0.08);
 			color: rgba(255, 255, 255, 0.4);
 		}
 	}
 }
 
+// ─── Loading ─────────────────────────────────────────────────────────────────
 .loading {
-	text-align: center;
-	color: rgba(255, 255, 255, 0.5);
-	padding: 48px;
-	font-size: 1.1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+	padding: 80px;
+	color: rgba(255, 255, 255, 0.4);
+	font-size: 1rem;
+}
+.spinner {
+	width: 36px;
+	height: 36px;
+	border: 3px solid rgba(255, 255, 255, 0.1);
+	border-top-color: #4caf50;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 
+// ─── Content ─────────────────────────────────────────────────────────────────
 .content {
-	max-width: 800px;
+	flex: 1;
+	max-width: 900px;
+	width: 100%;
 	margin: 0 auto;
-	padding: 32px 16px;
+	padding: 24px 16px;
+}
+
+// ─── Lobby ───────────────────────────────────────────────────────────────────
+.lobby-area {
 	display: flex;
 	flex-direction: column;
 	gap: 24px;
+	max-width: 400px;
+	margin: 40px auto;
 }
 
-.info-panel {
-	display: flex;
-	gap: 24px;
-}
-
-.players {
+.lobby-players {
 	background: rgba(0, 0, 0, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 12px;
-	padding: 20px;
-	flex: 1;
+	border-radius: 14px;
+	padding: 24px;
 
 	h3 {
-		margin: 0 0 16px;
-		color: rgba(255, 255, 255, 0.6);
+		margin: 0 0 20px;
 		font-size: 0.85rem;
 		text-transform: uppercase;
-	}
-
-	.player {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 8px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-		font-size: 1.1rem;
-
-		&.active {
-			color: #ff9800;
-		}
-
-		.crown {
-			font-size: 0.85rem;
-		}
-
-		.turn {
-			font-size: 0.75rem;
-			color: #ff9800;
-			margin-left: auto;
-		}
+		letter-spacing: 0.1em;
+		color: rgba(255, 255, 255, 0.4);
 	}
 }
 
-.trump {
-	background: rgba(0, 0, 0, 0.4);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 12px;
-	padding: 20px;
-	text-align: center;
-
-	h3 {
-		margin: 0 0 16px;
-		color: rgba(255, 255, 255, 0.6);
-		font-size: 0.85rem;
-		text-transform: uppercase;
-	}
-
-	.trump-card {
-		font-size: 2.5rem;
-	}
-}
-
-.actions {
+.lobby-player {
 	display: flex;
-	gap: 12px;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 0;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	font-size: 1.05rem;
 
-	button {
-		padding: 12px 24px;
-		border-radius: 8px;
-		border: none;
-		font-size: 1rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.2s;
+	&.empty {
+		color: rgba(255, 255, 255, 0.25);
+		font-style: italic;
 	}
 
-	.join-btn {
-		background: #2196f3;
-		color: white;
-
-		&:hover {
-			background: #1e88e5;
-		}
-	}
-
-	.start-btn {
+	.dot {
+		width: 8px;
+		height: 8px;
 		background: #4caf50;
-		color: white;
-
-		&:hover {
-			background: #43a047;
+		border-radius: 50%;
+		&.empty {
+			background: rgba(255, 255, 255, 0.15);
 		}
 	}
 
-	.refresh-btn {
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		border: 1px solid rgba(255, 255, 255, 0.2) !important;
-
-		&:hover {
-			background: rgba(255, 255, 255, 0.2);
-		}
+	.crown {
+		margin-left: auto;
+		font-size: 0.9rem;
 	}
 }
+
+.lobby-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.hint {
+	text-align: center;
+	color: rgba(255, 255, 255, 0.4);
+	font-size: 0.9rem;
+	margin: 0;
+}
+
+// ─── Buttons ─────────────────────────────────────────────────────────────────
+.btn {
+	padding: 11px 24px;
+	border-radius: 8px;
+	border: none;
+	font-size: 1rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: all 0.18s;
+	letter-spacing: 0.02em;
+}
+.btn-join {
+	background: #2196f3;
+	color: white;
+	&:hover {
+		background: #1e88e5;
+	}
+}
+.btn-start {
+	background: #4caf50;
+	color: white;
+	&:hover {
+		background: #43a047;
+		transform: translateY(-1px);
+	}
+}
+.btn-refresh {
+	background: rgba(255, 255, 255, 0.08);
+	color: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	&:hover {
+		background: rgba(255, 255, 255, 0.14);
+	}
+}
+.btn-take {
+	background: rgba(231, 76, 60, 0.2);
+	color: #e74c3c;
+	border: 1px solid rgba(231, 76, 60, 0.4);
+	&:hover {
+		background: rgba(231, 76, 60, 0.35);
+	}
+}
+.btn-done {
+	background: rgba(76, 175, 80, 0.2);
+	color: #81c784;
+	border: 1px solid rgba(76, 175, 80, 0.4);
+	&:hover {
+		background: rgba(76, 175, 80, 0.35);
+	}
+}
+
+// ─── Game area ───────────────────────────────────────────────────────────────
 .game-area {
 	display: flex;
 	flex-direction: column;
-	gap: 32px;
+	gap: 20px;
 }
 
-.table {
-	background: rgba(0, 0, 0, 0.4);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 16px;
-	padding: 24px;
-}
-
-.table-info {
+// ─── Top bar ─────────────────────────────────────────────────────────────────
+.top-bar {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 24px;
-	padding-bottom: 16px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	justify-content: space-between;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 12px;
+	padding: 14px 20px;
+	gap: 12px;
+	flex-wrap: wrap;
+}
 
-	.trump-mini {
-		font-size: 1.1rem;
-		color: rgba(255, 255, 255, 0.8);
+.trump-block,
+.deck-block {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	.label {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: rgba(255, 255, 255, 0.35);
+	}
+}
 
-		.card {
-			font-size: 1.5rem;
-			margin-left: 8px;
-		}
+.trump-card {
+	font-size: 2rem;
+	color: $card-black;
+	background: $card-bg;
+	border-radius: 6px;
+	padding: 2px 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+	&.red {
+		color: $card-red;
+	}
+}
+
+.deck-count {
+	font-size: 1.1rem;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.round-status {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+}
+
+.badge {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 18px;
+	border-radius: 20px;
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+.attack-badge {
+	background: rgba(231, 76, 60, 0.15);
+	color: #e74c3c;
+	border: 1px solid rgba(231, 76, 60, 0.3);
+}
+.defend-badge {
+	background: rgba(41, 128, 185, 0.15);
+	color: #74b9ff;
+	border: 1px solid rgba(41, 128, 185, 0.3);
+}
+.wait-badge {
+	background: rgba(255, 255, 255, 0.06);
+	color: rgba(255, 255, 255, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cancel-btn {
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	color: white;
+	border-radius: 50%;
+	width: 22px;
+	height: 22px;
+	cursor: pointer;
+	font-size: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	&:hover {
+		background: rgba(255, 255, 255, 0.2);
+	}
+}
+
+// ─── Players row ─────────────────────────────────────────────────────────────
+.players-row {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.player-chip {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 16px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	flex: 1;
+	min-width: 120px;
+	transition: all 0.2s;
+
+	&.is-attacker {
+		border-color: rgba(231, 76, 60, 0.5);
+		background: rgba(231, 76, 60, 0.08);
+	}
+	&.is-defender {
+		border-color: rgba(41, 128, 185, 0.5);
+		background: rgba(41, 128, 185, 0.08);
+	}
+	&.is-me {
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 	}
 
-	.deck {
+	.player-name {
+		font-weight: 600;
+		font-size: 1rem;
+		flex: 1;
+	}
+	.role-tag {
+		font-size: 1rem;
+	}
+	.me-tag {
+		font-size: 0.7rem;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 4px;
+		padding: 2px 6px;
 		color: rgba(255, 255, 255, 0.5);
-		font-size: 0.95rem;
 	}
+}
+
+// ─── Table ───────────────────────────────────────────────────────────────────
+.table-area {
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 16px;
+	padding: 20px;
+	min-height: 160px;
+}
+
+.table-label {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: rgba(255, 255, 255, 0.3);
+	margin-bottom: 16px;
 }
 
 .table-cards {
-	min-height: 120px;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 16px;
+	gap: 20px;
 	justify-content: center;
-	padding: 16px 0;
+	min-height: 100px;
+	align-items: flex-start;
+}
+
+.empty-table {
+	color: rgba(255, 255, 255, 0.2);
+	font-size: 1rem;
+	text-align: center;
+	padding: 30px;
+	width: 100%;
 }
 
 .card-pair {
 	display: flex;
-	gap: 8px;
 	position: relative;
+	gap: 0;
 }
 
+// ─── Cards ───────────────────────────────────────────────────────────────────
 .card {
-	background: white;
-	color: #000;
-	border-radius: 8px;
-	padding: 12px 16px;
-	font-size: 1.8rem;
-	font-weight: 600;
-	min-width: 60px;
-	text-align: center;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-	transition: transform 0.2s;
-
-	&.attack {
-		border: 2px solid #ff5252;
-	}
-
-	&.defend {
-		border: 2px solid #4caf50;
-		margin-left: -20px;
-		transform: translateY(-10px);
-	}
-
-	&.empty {
-		background: rgba(255, 255, 255, 0.1);
-		color: rgba(255, 255, 255, 0.3);
-		border: 2px dashed rgba(255, 255, 255, 0.2);
-	}
-}
-
-.empty-table {
-	text-align: center;
-	color: rgba(255, 255, 255, 0.3);
-	padding: 32px;
-	font-size: 1.1rem;
-}
-
-.players-status {
-	display: flex;
-	gap: 16px;
-	margin-top: 24px;
-	flex-wrap: wrap;
-}
-
-.player-status {
-	flex: 1;
-	background: rgba(0, 0, 0, 0.3);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 8px;
-	padding: 12px 16px;
+	background: $card-bg;
+	color: $card-black;
+	border-radius: 10px;
+	font-size: 1.6rem;
+	font-weight: 700;
+	min-width: 58px;
+	height: 82px;
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: center;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	user-select: none;
+	position: relative;
+	transition:
+		transform 0.15s,
+		box-shadow 0.15s;
+	border: 2px solid transparent;
 
-	&.attacker {
-		border-color: #ff5252;
-		background: rgba(255, 82, 82, 0.1);
+	&.red {
+		color: $card-red;
+	}
+	&.trump {
+		border-color: $trump-glow;
+		box-shadow: 0 4px 14px rgba(241, 196, 15, 0.3);
 	}
 
-	&.defender {
-		border-color: #2196f3;
-		background: rgba(33, 150, 243, 0.1);
+	&.clickable {
+		cursor: pointer;
+		&:hover {
+			transform: translateY(-6px);
+			box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+		}
 	}
 
-	.name {
-		font-weight: 600;
-		font-size: 1.05rem;
-	}
-
-	.role {
-		font-size: 0.85rem;
-		color: rgba(255, 255, 255, 0.7);
+	&.selected {
+		border-color: $selected-color;
+		transform: translateY(-10px);
+		box-shadow: 0 12px 28px rgba(243, 156, 18, 0.4);
 	}
 }
 
-.my-hand {
-	background: rgba(0, 0, 0, 0.4);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 16px;
-	padding: 24px;
-
-	h3 {
-		margin: 0 0 16px;
-		color: rgba(255, 255, 255, 0.6);
-		font-size: 0.85rem;
-		text-transform: uppercase;
+.table-card {
+	&.attack-card {
+		border-color: rgba(231, 76, 60, 0.4);
+		z-index: 1;
+	}
+	&.defend-card {
+		border-color: rgba(41, 128, 185, 0.4);
+		margin-left: -22px;
+		margin-top: -12px;
+		z-index: 2;
+	}
+	&.empty-slot {
+		background: rgba(255, 255, 255, 0.06);
+		color: rgba(255, 255, 255, 0.15);
+		border: 2px dashed rgba(255, 255, 255, 0.15);
+		box-shadow: none;
+		margin-left: -22px;
+		margin-top: -12px;
 	}
 
-	.cards {
-		display: flex;
-		gap: 12px;
-		flex-wrap: wrap;
-		justify-content: center;
-
-		.card {
-			cursor: pointer;
-
-			&:hover {
-				transform: translateY(-8px);
-			}
+	&.clickable {
+		cursor: pointer;
+		&:hover {
+			transform: translateY(-4px) scale(1.05);
+			border-color: $defend-color;
+			box-shadow: 0 8px 20px rgba(41, 128, 185, 0.4);
 		}
 	}
 }
 
-.game-over {
-	text-align: center;
-	padding: 48px;
-	background: rgba(0, 0, 0, 0.4);
+// ─── Action buttons ───────────────────────────────────────────────────────────
+.action-btns {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+}
+
+// ─── Hand ────────────────────────────────────────────────────────────────────
+.my-hand {
+	background: rgba(0, 0, 0, 0.35);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 16px;
+	padding: 20px;
+}
 
+.hand-label {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: rgba(255, 255, 255, 0.35);
+	margin-bottom: 16px;
+
+	.hint-inline {
+		color: #74b9ff;
+		text-transform: none;
+		letter-spacing: 0;
+		font-size: 0.8rem;
+	}
+}
+
+.hand-cards {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+}
+
+.hand-card {
+	// inherits .card styles
+}
+
+.no-cards {
+	color: rgba(255, 255, 255, 0.2);
+	font-size: 0.95rem;
+	text-align: center;
+	padding: 20px;
+	width: 100%;
+}
+
+// ─── Game over ───────────────────────────────────────────────────────────────
+.game-over {
+	text-align: center;
+	padding: 60px 24px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+
+	.game-over-icon {
+		font-size: 4rem;
+		animation: bounce 1s ease infinite alternate;
+	}
 	h2 {
 		font-size: 2rem;
-		margin-bottom: 24px;
-		color: #ff9800;
+		margin: 0;
+		color: #ffb74d;
 	}
 
-	p {
-		font-size: 1.2rem;
-		margin-bottom: 32px;
-		color: rgba(255, 255, 255, 0.8);
+	.winner-text {
+		font-size: 1.4rem;
+		color: #81c784;
+		font-weight: 700;
+		margin: 0;
+	}
+	.loser-text {
+		font-size: 1.4rem;
+		color: #e57373;
+		font-weight: 700;
+		margin: 0;
+	}
+	.loser-sub {
+		color: rgba(255, 255, 255, 0.5);
+		font-size: 0.95rem;
+		margin: -8px 0 0;
+	}
+}
+
+@keyframes bounce {
+	from {
+		transform: translateY(0);
+	}
+	to {
+		transform: translateY(-12px);
 	}
 }
