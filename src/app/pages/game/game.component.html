@@ -1,8 +1,8 @@
 <div class="game-page">
-	<header>
+	<header class="game-header">
 		<button class="back-btn" (click)="backToLobby()">← Лобі</button>
 		<h1>🃏 Дурак</h1>
-		<span class="status" [class]="game()?.status ?? ''">
+		<span class="status-badge" [class]="game()?.status ?? ''">
 			{{
 				game()?.status === 'lobby'
 					? 'Лобі'
@@ -16,7 +16,7 @@
 	@if (loading()) {
 		<div class="loading">
 			<div class="spinner"></div>
-			Завантаження...
+			<span>Завантаження...</span>
 		</div>
 	} @else if (game(); as g) {
 		<div class="content">
@@ -34,19 +34,13 @@
 								}
 							</div>
 						}
-						@if (g.players.length < g.maxPlayers) {
-							@for (
-								i of [].constructor(g.maxPlayers - g.players.length);
-								track $index
-							) {
-								<div class="lobby-player empty">
-									<span class="dot empty"></span>
-									<span>Чекаємо гравця...</span>
-								</div>
-							}
+						@for (i of [].constructor(g.maxPlayers - g.players.length); track $index) {
+							<div class="lobby-player empty">
+								<span class="dot empty"></span>
+								<span>Чекаємо гравця...</span>
+							</div>
 						}
 					</div>
-
 					<div class="lobby-actions">
 						@if (!isPlayer() && g.players.length < g.maxPlayers) {
 							<button class="btn btn-join" (click)="joinGame()">Приєднатись</button>
@@ -58,7 +52,7 @@
 						} @else if (isCreator()) {
 							<p class="hint">Чекаємо ще одного гравця</p>
 						} @else if (isPlayer()) {
-							<p class="hint">Чекаємо коли хост почне гру</p>
+							<p class="hint">Чекаємо поки хост почне гру</p>
 						}
 						<button class="btn btn-refresh" (click)="loadGame()">🔄 Оновити</button>
 					</div>
@@ -68,43 +62,47 @@
 			<!-- ══════════════ ГРА ══════════════ -->
 			@if (g.status === 'running') {
 				<div class="game-area">
-					<!-- Верхня панель: козир + колода + статус -->
+					<!-- Верхня панель -->
 					<div class="top-bar">
+						<!-- Козир -->
 						<div class="trump-block">
 							<span class="label">Козир</span>
-							<span
-								class="trump-card"
+							<div
+								class="card trump-card-display"
 								[class.red]="cardColor(g.data?.trump ?? '') === 'red'"
 							>
-								{{ g.data?.trump ?? '?' }}
-							</span>
+								<span class="card-rank">{{ cardRank(g.data?.trump ?? '') }}</span>
+								<span class="card-suit">{{ cardSuit(g.data?.trump ?? '') }}</span>
+							</div>
 						</div>
 
+						<!-- Статус раунду -->
 						<div class="round-status">
 							@if (isAttacker()) {
-								<span class="badge attack-badge">⚔️ Твій хід — атакуй!</span>
+								<span class="badge attack-badge">⚔️ Атакуй!</span>
 							} @else if (isDefender()) {
 								@if (defendMode()) {
 									<span class="badge defend-badge">
-										🛡️ Вибери карту на столі щоб відбити
+										🛡️ Клікни карту на столі
 										<button class="cancel-btn" (click)="cancelDefendSelect()">
 											✕
 										</button>
 									</span>
 								} @else {
-									<span class="badge defend-badge">🛡️ Ти захищаєшся</span>
+									<span class="badge defend-badge">🛡️ Захищайся</span>
 								}
 							} @else {
-								<span class="badge wait-badge">⏳ Чекай ходу</span>
+								<span class="badge wait-badge">⏳ Хід суперника</span>
 							}
 						</div>
 
+						<!-- Колода -->
 						<div class="deck-block">
-							<span class="label">Скид/Колода</span>
-							<span class="deck-count"
-								>{{ g.data?.discard?.length ?? 0 }} /
-								{{ g.data?.table?.length ?? 0 }}</span
-							>
+							<span class="label">Скид / Стіл</span>
+							<span class="deck-count">
+								{{ g.data?.discard?.length ?? 0 }} /
+								{{ g.data?.table?.length ?? 0 }}
+							</span>
 						</div>
 					</div>
 
@@ -116,17 +114,26 @@
 								[class.is-attacker]="g.data?.attacker === player._id"
 								[class.is-defender]="g.data?.defender === player._id"
 								[class.is-me]="player._id === myId"
+								[class.is-winner]="isWinner(player._id)"
 							>
 								<span class="player-name">{{ player.name }}</span>
-								@if (g.data?.attacker === player._id) {
-									<span class="role-tag attack">⚔️</span>
-								}
-								@if (g.data?.defender === player._id) {
-									<span class="role-tag defend">🛡️</span>
-								}
-								@if (player._id === myId) {
-									<span class="me-tag">ти</span>
-								}
+								<div class="player-tags">
+									@if (g.data?.attacker === player._id) {
+										<span class="role-tag attack">⚔️</span>
+									}
+									@if (g.data?.defender === player._id) {
+										<span class="role-tag defend">🛡️</span>
+									}
+									@if (player._id === myId) {
+										<span class="me-tag">ти</span>
+									}
+									@if (isDoneBy(player._id)) {
+										<span class="done-tag">✅</span>
+									}
+									@if (isWinner(player._id)) {
+										<span class="winner-tag">🏆</span>
+									}
+								</div>
 							</div>
 						}
 					</div>
@@ -136,11 +143,17 @@
 						<div class="table-label">Стіл</div>
 						<div class="table-cards">
 							@if ((g.data?.table?.length ?? 0) === 0) {
-								<div class="empty-table">Стіл порожній — атакуй!</div>
+								<div class="empty-table">
+									@if (isAttacker()) {
+										Вибери карту з руки щоб атакувати
+									} @else {
+										Чекаємо атаки...
+									}
+								</div>
 							} @else {
 								@for (pair of g.data!.table!; track $index) {
 									<div class="card-pair">
-										<!-- Атакуюча карта: клікабельна для захисника -->
+										<!-- Атакуюча карта -->
 										<div
 											class="card table-card attack-card"
 											[class.red]="cardColor(pair.attack) === 'red'"
@@ -148,22 +161,38 @@
 											[class.clickable]="
 												isDefender() && defendMode() && !pair.defend
 											"
+											[class.open]="!pair.defend"
 											(click)="onAttackCardClick(pair.attack)"
 										>
-											<span class="card-value">{{ pair.attack }}</span>
+											<span class="card-rank">{{
+												cardRank(pair.attack)
+											}}</span>
+											<span class="card-suit">{{
+												cardSuit(pair.attack)
+											}}</span>
 										</div>
 
+										<!-- Карта захисту або пустий слот -->
 										@if (pair.defend) {
 											<div
 												class="card table-card defend-card"
 												[class.red]="cardColor(pair.defend) === 'red'"
 												[class.trump]="isTrumpSuit(pair.defend)"
 											>
-												<span class="card-value">{{ pair.defend }}</span>
+												<span class="card-rank">{{
+													cardRank(pair.defend)
+												}}</span>
+												<span class="card-suit">{{
+													cardSuit(pair.defend)
+												}}</span>
 											</div>
 										} @else {
 											<div class="card table-card empty-slot">
-												<span>?</span>
+												@if (isDefender() && defendMode()) {
+													<span class="slot-hint">👆</span>
+												} @else {
+													<span class="slot-empty">–</span>
+												}
 											</div>
 										}
 									</div>
@@ -173,26 +202,36 @@
 					</div>
 
 					<!-- Кнопки дій -->
-					@if (isMyTurn()) {
-						<div class="action-btns">
-							@if (isDefender() && hasOpenAttacks()) {
-								<button class="btn btn-take" (click)="take()">
-									😔 Взяти карти
-								</button>
-							}
-							@if (allDefended() && (isAttacker() || isDefender())) {
-								<button class="btn btn-done" (click)="done()">✅ Готово</button>
-							}
-						</div>
-					}
+					<div class="action-btns">
+						<!-- Атакуючий: Готово (можна після першої кинутої карти) -->
+						@if (canAttackerDone()) {
+							<button class="btn btn-done" (click)="done()">✅ Готово</button>
+						}
+
+						<!-- Захисник: Взяти карти (якщо є атака) -->
+						@if (canTake()) {
+							<button class="btn btn-take" (click)="take()">😔 Взяти</button>
+						}
+
+						<!-- Захисник: Готово (тільки якщо всі відбиті) -->
+						@if (canDefenderDone()) {
+							<button class="btn btn-done" (click)="done()">✅ Відбив</button>
+						}
+					</div>
 
 					<!-- Мої карти -->
 					@if (isPlayer()) {
 						<div class="my-hand">
 							<div class="hand-label">
-								Твої карти ({{ myCards().length }})
-								@if (defendMode()) {
+								Мої карти ({{ myCards().length }})
+								@if (isAttacker()) {
+									<span class="hint-inline"> — клікни щоб атакувати</span>
+								} @else if (isDefender() && !defendMode()) {
 									<span class="hint-inline"> — вибери карту для захисту</span>
+								} @else if (isDefender() && defendMode()) {
+									<span class="hint-inline selected-hint">
+										— тепер клікни карту на столі</span
+									>
 								}
 							</div>
 							<div class="hand-cards">
@@ -205,11 +244,12 @@
 										[class.clickable]="isMyTurn()"
 										(click)="onHandCardClick(card)"
 									>
-										<span class="card-value">{{ card }}</span>
+										<span class="card-rank">{{ cardRank(card) }}</span>
+										<span class="card-suit">{{ cardSuit(card) }}</span>
 									</div>
 								}
 								@if (myCards().length === 0) {
-									<div class="no-cards">Немає карт</div>
+									<div class="no-cards">🎉 Немає карт — ти виграв!</div>
 								}
 							</div>
 						</div>
@@ -227,8 +267,20 @@
 							<p class="loser-text">Ти — <strong>Дурак</strong> 😅</p>
 						} @else {
 							<p class="winner-text">Ти переміг! 🏆</p>
-							<p class="loser-sub">Дурак: {{ playerName(loserId) }}</p>
+							<p class="loser-sub">
+								Дурак: <strong>{{ playerName(loserId) }}</strong>
+							</p>
 						}
+					} @else {
+						<p class="winner-text">Нічия! Всі молодці 🤝</p>
+					}
+					@if ((g.data?.winners?.length ?? 0) > 0) {
+						<div class="winners-list">
+							<span class="label">Переможці:</span>
+							@for (wId of g.data!.winners!; track wId) {
+								<span class="winner-name">🏆 {{ playerName(wId) }}</span>
+							}
+						</div>
 					}
 					<button class="btn btn-start" (click)="backToLobby()">
 						Повернутись в лобі

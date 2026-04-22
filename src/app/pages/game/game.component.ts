@@ -24,6 +24,7 @@ export class GameComponent implements OnInit, OnDestroy {
 	private _route = inject(ActivatedRoute);
 
 	private _interval: any;
+	private _isProcessing = false;
 
 	game = signal(this._gameService.game());
 	myCards = signal<string[]>([]);
@@ -32,6 +33,9 @@ export class GameComponent implements OnInit, OnDestroy {
 	// Захист: вибрана карта з руки → потім клік по атакуючій на столі
 	selectedCard = signal<string | null>(null);
 	defendMode = signal(false);
+
+	// Кількість карт у кожного гравця (зберігаємо окремо, бо API не повертає)
+	playerCardCounts = signal<Record<string, number>>({});
 
 	get gameId() {
 		return this._route.snapshot.params['id'];
@@ -45,34 +49,64 @@ export class GameComponent implements OnInit, OnDestroy {
 	isDefender = computed(() => this.game()?.data?.defender === this.myId);
 	isMyTurn = computed(() => this.isAttacker() || this.isDefender());
 
+	// Чи може атакуючий натиснути "Готово"
+	// Атакуючий може завершити хід якщо: є хоч одна карта на столі
+	// (незалежно від того чи всі відбиті)
+	canAttackerDone = computed(() => {
+		const table = this.game()?.data?.table;
+		return this.isAttacker() && (table?.length ?? 0) > 0;
+	});
+
+	// Захисник може натиснути "Готово" тільки якщо всі карти відбиті
+	canDefenderDone = computed(() => {
+		return this.isDefender() && this.allDefended();
+	});
+
+	// Захисник може взяти карти якщо є хоч одна атака на столі
+	canTake = computed(() => {
+		return this.isDefender() && (this.game()?.data?.table?.length ?? 0) > 0;
+	});
+
 	ngOnInit() {
 		if (!this._auth.token()) {
 			this._router.navigate(['/login']);
 			return;
 		}
 		this.loadGame();
-		this._interval = setInterval(() => this.loadGame(), 3000);
+		this._interval = setInterval(() => {
+			if (!this._isProcessing) {
+				this.loadGame(false);
+			}
+		}, 3000);
 	}
 
 	ngOnDestroy() {
 		clearInterval(this._interval);
 	}
 
-	loadGame() {
-		this._gameService.loadGame(this.gameId).subscribe((game) => {
-			this._gameService.game.set(game);
-			this.game.set(game);
-			this.loading.set(false);
+	loadGame(showLoading = true) {
+		if (showLoading) this.loading.set(true);
 
-			if (game.status === 'running' && this.isPlayer()) {
-				this._gameService.loadMyCards(this.gameId).subscribe({
-					next: (cards) => {
-						this._gameService.myCards.set(cards);
-						this.myCards.set(cards);
-					},
-					error: (err) => console.error('Error loading cards:', err),
-				});
-			}
+		this._gameService.loadGame(this.gameId).subscribe({
+			next: (game) => {
+				this._gameService.game.set(game);
+				this.game.set(game);
+				this.loading.set(false);
+
+				if (game.status === 'running' && this.isPlayer()) {
+					this._gameService.loadMyCards(this.gameId).subscribe({
+						next: (cards) => {
+							this._gameService.myCards.set(cards);
+							this.myCards.set(cards);
+						},
+						error: (err) => console.error('Error loading cards:', err),
+					});
+				}
+			},
+			error: (err) => {
+				console.error('Error loading game:', err);
+				this.loading.set(false);
+			},
 		});
 	}
 
@@ -88,7 +122,7 @@ export class GameComponent implements OnInit, OnDestroy {
 		this._gameService.startGame(this.gameId).subscribe((game) => {
 			if (game) {
 				this.game.set(game);
-				this.loadGame();
+				this.loadGame(false);
 			}
 		});
 	}
@@ -96,18 +130,21 @@ export class GameComponent implements OnInit, OnDestroy {
 	// ─── Ігрова логіка ───────────────────────────────────────────
 
 	onHandCardClick(card: string) {
-		if (!this.isMyTurn()) return;
+		if (!this.isMyTurn() || this._isProcessing) return;
 
 		if (this.isAttacker()) {
+			// Атакуючий просто кидає карту
 			this.attack(card);
 			return;
 		}
 
 		if (this.isDefender()) {
 			if (this.selectedCard() === card) {
+				// Повторний клік — скасувати вибір
 				this.selectedCard.set(null);
 				this.defendMode.set(false);
 			} else {
+				// Вибрати карту для захисту
 				this.selectedCard.set(card);
 				this.defendMode.set(true);
 			}
@@ -116,6 +153,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
 	onAttackCardClick(attackCard: string) {
 		if (!this.isDefender() || !this.defendMode() || !this.selectedCard()) return;
+		if (this._isProcessing) return;
 
 		const pair = this.game()?.data?.table?.find((p) => p.attack === attackCard && !p.defend);
 		if (!pair) return;
@@ -126,41 +164,68 @@ export class GameComponent implements OnInit, OnDestroy {
 	}
 
 	attack(card: string) {
-		this._gameService.makeMove(this.gameId, 'attack', { card }).subscribe((game) => {
-			if (game) {
-				this.game.set(game);
-				this.loadGame();
-			}
+		this._isProcessing = true;
+		this._gameService.makeMove(this.gameId, 'attack', { card }).subscribe({
+			next: (game) => {
+				this._isProcessing = false;
+				if (game) {
+					this.game.set(game);
+					this.loadGame(false);
+				}
+			},
+			error: () => {
+				this._isProcessing = false;
+			},
 		});
 	}
 
 	defend(attackCard: string, card: string) {
-		this._gameService
-			.makeMove(this.gameId, 'defend', { attackCard, card })
-			.subscribe((game) => {
+		this._isProcessing = true;
+		this._gameService.makeMove(this.gameId, 'defend', { attackCard, card }).subscribe({
+			next: (game) => {
+				this._isProcessing = false;
 				if (game) {
 					this.game.set(game);
-					this.loadGame();
+					this.loadGame(false);
 				}
-			});
+			},
+			error: () => {
+				this._isProcessing = false;
+			},
+		});
 	}
 
 	take() {
-		if (!this.isDefender()) return;
-		this._gameService.makeMove(this.gameId, 'take').subscribe((game) => {
-			if (game) {
-				this.game.set(game);
-				this.loadGame();
-			}
+		if (!this.isDefender() || this._isProcessing) return;
+		this._isProcessing = true;
+		this._gameService.makeMove(this.gameId, 'take').subscribe({
+			next: (game) => {
+				this._isProcessing = false;
+				if (game) {
+					this.game.set(game);
+					this.loadGame(false);
+				}
+			},
+			error: () => {
+				this._isProcessing = false;
+			},
 		});
 	}
 
 	done() {
-		this._gameService.makeMove(this.gameId, 'done').subscribe((game) => {
-			if (game) {
-				this.game.set(game);
-				this.loadGame();
-			}
+		if (this._isProcessing) return;
+		this._isProcessing = true;
+		this._gameService.makeMove(this.gameId, 'done').subscribe({
+			next: (game) => {
+				this._isProcessing = false;
+				if (game) {
+					this.game.set(game);
+					this.loadGame(false);
+				}
+			},
+			error: () => {
+				this._isProcessing = false;
+			},
 		});
 	}
 
@@ -184,13 +249,21 @@ export class GameComponent implements OnInit, OnDestroy {
 	}
 
 	cardColor(card: string): 'red' | 'black' {
-		const suit = card.slice(-1);
+		const suit = card?.slice(-1);
 		return suit === '♥' || suit === '♦' ? 'red' : 'black';
+	}
+
+	cardRank(card: string): string {
+		return card?.slice(0, -1) ?? '';
+	}
+
+	cardSuit(card: string): string {
+		return card?.slice(-1) ?? '';
 	}
 
 	isTrumpSuit(card: string): boolean {
 		const trump = this.game()?.data?.trump;
-		if (!trump) return false;
+		if (!trump || !card) return false;
 		return card.slice(-1) === trump.slice(-1);
 	}
 
@@ -203,7 +276,19 @@ export class GameComponent implements OnInit, OnDestroy {
 		return table && table.length > 0 && table.every((p) => !!p.defend);
 	}
 
+	isDoneBy(playerId: string) {
+		return this.game()?.data?.doneBy?.includes(playerId) ?? false;
+	}
+
+	isWinner(playerId: string) {
+		return this.game()?.data?.winners?.includes(playerId) ?? false;
+	}
+
 	backToLobby() {
 		this._router.navigate(['/lobby']);
+	}
+
+	trackByIndex(index: number) {
+		return index;
 	}
 }

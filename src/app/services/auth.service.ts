@@ -17,10 +17,16 @@ export class AuthService {
 
 	saveToken(token: string, name: string) {
 		const payload = JSON.parse(atob(token.split('.')[1]));
+		console.log('JWT payload:', payload);
+
+		// njwt зберігає _id як об'єкт або рядок — нормалізуємо
+		const rawId = payload._id;
+		const _id = typeof rawId === 'object' ? (rawId.$oid ?? rawId.toString()) : String(rawId);
+
 		localStorage.setItem('token', token);
-		localStorage.setItem('user', JSON.stringify({ _id: payload._id, name }));
+		localStorage.setItem('user', JSON.stringify({ _id, name }));
 		this.token.set(token);
-		this.user.set({ _id: payload._id, name });
+		this.user.set({ _id, name });
 	}
 
 	logout() {

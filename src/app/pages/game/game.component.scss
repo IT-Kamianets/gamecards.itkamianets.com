@@ -1,131 +1,139 @@
-// ─── Variables ───────────────────────────────────────────────────────────────
-$green-dark: #0d2b13;
-$green-mid: #1a5c2a;
-$card-bg: #fffdf5;
-$card-red: #c0392b;
-$card-black: #1a1a2e;
-$trump-glow: #f1c40f;
-$attack-color: #e74c3c;
-$defend-color: #2980b9;
-$selected-color: #f39c12;
+// ─── Variables ────────────────────────────────────────────────
+$bg: #0f1923;
+$surface: #182535;
+$surface2: #1e3045;
+$border: #2a4060;
+$accent: #e8c84a;
+$accent2: #f0a030;
+$red: #e84040;
+$text: #d4e8f0;
+$text-dim: #7a9ab8;
+$green: #4caf50;
+$blue: #4a90e2;
+$radius: 10px;
+$card-radius: 8px;
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// ─── Base ──────────────────────────────────────────────────────
 .game-page {
 	min-height: 100vh;
-	background: radial-gradient(ellipse at 60% 40%, #1a5c2a 0%, #0d2b13 70%, #060f08 100%);
-	color: white;
+	background: $bg;
+	color: $text;
 	font-family: 'Georgia', serif;
 	display: flex;
 	flex-direction: column;
 }
 
-// ─── Header ──────────────────────────────────────────────────────────────────
-header {
+// ─── Header ───────────────────────────────────────────────────
+.game-header {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: 14px 28px;
-	background: rgba(0, 0, 0, 0.5);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	backdrop-filter: blur(8px);
+	gap: 12px;
+	padding: 12px 20px;
+	background: $surface;
+	border-bottom: 1px solid $border;
 
 	h1 {
 		margin: 0;
-		font-size: 1.4rem;
-		letter-spacing: 0.05em;
-	}
-
-	.back-btn {
-		padding: 7px 16px;
-		border-radius: 6px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		background: transparent;
-		color: rgba(255, 255, 255, 0.7);
-		cursor: pointer;
-		font-size: 0.9rem;
-		transition: all 0.2s;
-		&:hover {
-			background: rgba(255, 255, 255, 0.08);
-			color: white;
-		}
-	}
-
-	.status {
-		padding: 4px 14px;
-		border-radius: 20px;
-		font-size: 0.8rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		&.lobby {
-			background: rgba(76, 175, 80, 0.2);
-			color: #81c784;
-		}
-		&.running {
-			background: rgba(255, 152, 0, 0.2);
-			color: #ffb74d;
-		}
-		&.finished {
-			background: rgba(255, 255, 255, 0.08);
-			color: rgba(255, 255, 255, 0.4);
-		}
+		font-size: 1.3rem;
+		color: $accent;
+		flex: 1;
+		text-align: center;
 	}
 }
 
-// ─── Loading ─────────────────────────────────────────────────────────────────
+.back-btn {
+	background: none;
+	border: 1px solid $border;
+	color: $text-dim;
+	padding: 6px 12px;
+	border-radius: $radius;
+	cursor: pointer;
+	font-size: 0.85rem;
+	transition: all 0.2s;
+
+	&:hover {
+		border-color: $accent;
+		color: $accent;
+	}
+}
+
+.status-badge {
+	padding: 4px 10px;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+
+	&.lobby {
+		background: #2a3f5f;
+		color: $blue;
+	}
+	&.running {
+		background: #1a3f1a;
+		color: $green;
+	}
+	&.finished {
+		background: #3f1a1a;
+		color: $red;
+	}
+}
+
+// ─── Loading ──────────────────────────────────────────────────
 .loading {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	gap: 16px;
-	padding: 80px;
-	color: rgba(255, 255, 255, 0.4);
-	font-size: 1rem;
+	flex: 1;
+	color: $text-dim;
 }
+
 .spinner {
 	width: 36px;
 	height: 36px;
-	border: 3px solid rgba(255, 255, 255, 0.1);
-	border-top-color: #4caf50;
+	border: 3px solid $border;
+	border-top-color: $accent;
 	border-radius: 50%;
 	animation: spin 0.8s linear infinite;
 }
+
 @keyframes spin {
 	to {
 		transform: rotate(360deg);
 	}
 }
 
-// ─── Content ─────────────────────────────────────────────────────────────────
+// ─── Content ──────────────────────────────────────────────────
 .content {
 	flex: 1;
+	padding: 16px;
 	max-width: 900px;
-	width: 100%;
 	margin: 0 auto;
-	padding: 24px 16px;
+	width: 100%;
+	box-sizing: border-box;
 }
 
-// ─── Lobby ───────────────────────────────────────────────────────────────────
+// ─── Lobby ────────────────────────────────────────────────────
 .lobby-area {
 	display: flex;
 	flex-direction: column;
-	gap: 24px;
+	gap: 20px;
 	max-width: 400px;
 	margin: 40px auto;
 }
 
 .lobby-players {
-	background: rgba(0, 0, 0, 0.4);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 14px;
-	padding: 24px;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius;
+	padding: 20px;
 
 	h3 {
-		margin: 0 0 20px;
-		font-size: 0.85rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: rgba(255, 255, 255, 0.4);
+		margin: 0 0 16px;
+		color: $accent;
+		font-size: 1rem;
 	}
 }
 
@@ -133,447 +141,550 @@ header {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	padding: 10px 0;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	font-size: 1.05rem;
+	padding: 8px 0;
+	border-bottom: 1px solid $border;
 
+	&:last-child {
+		border-bottom: none;
+	}
 	&.empty {
-		color: rgba(255, 255, 255, 0.25);
+		opacity: 0.4;
 		font-style: italic;
 	}
 
-	.dot {
-		width: 8px;
-		height: 8px;
-		background: #4caf50;
-		border-radius: 50%;
-		&.empty {
-			background: rgba(255, 255, 255, 0.15);
-		}
-	}
-
 	.crown {
-		margin-left: auto;
-		font-size: 0.9rem;
+		font-size: 1rem;
+	}
+}
+
+.dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: $green;
+	flex-shrink: 0;
+
+	&.empty {
+		background: $border;
 	}
 }
 
 .lobby-actions {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 10px;
+
+	.hint {
+		text-align: center;
+		color: $text-dim;
+		font-size: 0.85rem;
+		margin: 0;
+	}
 }
 
-.hint {
-	text-align: center;
-	color: rgba(255, 255, 255, 0.4);
-	font-size: 0.9rem;
-	margin: 0;
-}
-
-// ─── Buttons ─────────────────────────────────────────────────────────────────
+// ─── Buttons ──────────────────────────────────────────────────
 .btn {
-	padding: 11px 24px;
-	border-radius: 8px;
+	padding: 10px 20px;
 	border: none;
-	font-size: 1rem;
-	font-weight: 700;
+	border-radius: $radius;
+	font-size: 0.95rem;
 	cursor: pointer;
-	transition: all 0.18s;
-	letter-spacing: 0.02em;
-}
-.btn-join {
-	background: #2196f3;
-	color: white;
-	&:hover {
-		background: #1e88e5;
+	font-family: inherit;
+	transition: all 0.15s;
+	font-weight: bold;
+
+	&:active {
+		transform: scale(0.97);
 	}
-}
-.btn-start {
-	background: #4caf50;
-	color: white;
-	&:hover {
-		background: #43a047;
-		transform: translateY(-1px);
+
+	&.btn-join {
+		background: $blue;
+		color: #fff;
 	}
-}
-.btn-refresh {
-	background: rgba(255, 255, 255, 0.08);
-	color: rgba(255, 255, 255, 0.7);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	&:hover {
-		background: rgba(255, 255, 255, 0.14);
+	&.btn-start {
+		background: $green;
+		color: #fff;
 	}
-}
-.btn-take {
-	background: rgba(231, 76, 60, 0.2);
-	color: #e74c3c;
-	border: 1px solid rgba(231, 76, 60, 0.4);
-	&:hover {
-		background: rgba(231, 76, 60, 0.35);
+	&.btn-refresh {
+		background: $surface2;
+		color: $text-dim;
+		border: 1px solid $border;
 	}
-}
-.btn-done {
-	background: rgba(76, 175, 80, 0.2);
-	color: #81c784;
-	border: 1px solid rgba(76, 175, 80, 0.4);
+	&.btn-take {
+		background: $red;
+		color: #fff;
+	}
+	&.btn-done {
+		background: $green;
+		color: #fff;
+	}
+
 	&:hover {
-		background: rgba(76, 175, 80, 0.35);
+		filter: brightness(1.15);
 	}
 }
 
-// ─── Game area ───────────────────────────────────────────────────────────────
+// ─── Game Area ────────────────────────────────────────────────
 .game-area {
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
+	gap: 14px;
 }
 
-// ─── Top bar ─────────────────────────────────────────────────────────────────
+// ─── Top Bar ──────────────────────────────────────────────────
 .top-bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background: rgba(0, 0, 0, 0.35);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: 12px;
-	padding: 14px 20px;
-	gap: 12px;
-	flex-wrap: wrap;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius;
+	padding: 12px 16px;
+	gap: 10px;
+
+	.label {
+		display: block;
+		font-size: 0.7rem;
+		color: $text-dim;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		margin-bottom: 6px;
+	}
 }
 
 .trump-block,
 .deck-block {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	.label {
-		font-size: 0.7rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: rgba(255, 255, 255, 0.35);
-	}
+	text-align: center;
+	min-width: 70px;
 }
 
-.trump-card {
-	font-size: 2rem;
-	color: $card-black;
-	background: $card-bg;
-	border-radius: 6px;
-	padding: 2px 8px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-	&.red {
-		color: $card-red;
-	}
+.trump-card-display {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 56px;
+	font-size: 0.85rem;
 }
 
 .deck-count {
 	font-size: 1.1rem;
-	color: rgba(255, 255, 255, 0.6);
+	font-weight: bold;
+	color: $accent;
 }
 
 .round-status {
 	flex: 1;
-	display: flex;
-	justify-content: center;
+	text-align: center;
 }
 
+// ─── Badges ───────────────────────────────────────────────────
 .badge {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	padding: 8px 18px;
+	padding: 6px 14px;
 	border-radius: 20px;
-	font-size: 0.9rem;
-	font-weight: 600;
-}
-.attack-badge {
-	background: rgba(231, 76, 60, 0.15);
-	color: #e74c3c;
-	border: 1px solid rgba(231, 76, 60, 0.3);
-}
-.defend-badge {
-	background: rgba(41, 128, 185, 0.15);
-	color: #74b9ff;
-	border: 1px solid rgba(41, 128, 185, 0.3);
-}
-.wait-badge {
-	background: rgba(255, 255, 255, 0.06);
-	color: rgba(255, 255, 255, 0.4);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-}
+	font-size: 0.85rem;
+	font-weight: bold;
 
-.cancel-btn {
-	background: rgba(255, 255, 255, 0.1);
-	border: none;
-	color: white;
-	border-radius: 50%;
-	width: 22px;
-	height: 22px;
-	cursor: pointer;
-	font-size: 0.75rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	&:hover {
-		background: rgba(255, 255, 255, 0.2);
+	&.attack-badge {
+		background: rgba(232, 200, 74, 0.15);
+		color: $accent;
+		border: 1px solid rgba(232, 200, 74, 0.3);
+	}
+	&.defend-badge {
+		background: rgba(74, 144, 226, 0.15);
+		color: $blue;
+		border: 1px solid rgba(74, 144, 226, 0.3);
+	}
+	&.wait-badge {
+		background: rgba(122, 154, 184, 0.1);
+		color: $text-dim;
+		border: 1px solid $border;
 	}
 }
 
-// ─── Players row ─────────────────────────────────────────────────────────────
+.cancel-btn {
+	background: none;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	font-size: 0.9rem;
+	opacity: 0.7;
+	padding: 0 2px;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+// ─── Players ──────────────────────────────────────────────────
 .players-row {
 	display: flex;
-	gap: 12px;
+	gap: 8px;
 	flex-wrap: wrap;
 }
 
 .player-chip {
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 8px;
-	padding: 8px 16px;
-	border-radius: 10px;
-	background: rgba(0, 0, 0, 0.3);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	flex: 1;
-	min-width: 120px;
+	gap: 4px;
+	padding: 8px 14px;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius;
+	min-width: 80px;
 	transition: all 0.2s;
 
 	&.is-attacker {
-		border-color: rgba(231, 76, 60, 0.5);
-		background: rgba(231, 76, 60, 0.08);
-	}
-	&.is-defender {
-		border-color: rgba(41, 128, 185, 0.5);
-		background: rgba(41, 128, 185, 0.08);
-	}
-	&.is-me {
-		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+		border-color: $accent;
+		background: rgba(232, 200, 74, 0.08);
 	}
 
-	.player-name {
-		font-weight: 600;
-		font-size: 1rem;
-		flex: 1;
+	&.is-defender {
+		border-color: $blue;
+		background: rgba(74, 144, 226, 0.08);
 	}
-	.role-tag {
-		font-size: 1rem;
+
+	&.is-me {
+		box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
 	}
-	.me-tag {
-		font-size: 0.7rem;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 4px;
-		padding: 2px 6px;
-		color: rgba(255, 255, 255, 0.5);
+
+	&.is-winner {
+		border-color: $green;
+		background: rgba(76, 175, 80, 0.08);
 	}
 }
 
-// ─── Table ───────────────────────────────────────────────────────────────────
+.player-name {
+	font-size: 0.85rem;
+	font-weight: bold;
+	color: $text;
+}
+
+.player-tags {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+}
+
+.role-tag,
+.me-tag,
+.done-tag,
+.winner-tag {
+	font-size: 0.75rem;
+	padding: 1px 5px;
+	border-radius: 4px;
+}
+
+.me-tag {
+	background: $surface2;
+	color: $text-dim;
+	font-size: 0.7rem;
+}
+.done-tag {
+	font-size: 0.85rem;
+}
+.winner-tag {
+	font-size: 0.85rem;
+}
+
+// ─── Table ────────────────────────────────────────────────────
 .table-area {
-	background: rgba(0, 0, 0, 0.3);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: 16px;
-	padding: 20px;
-	min-height: 160px;
+	background: #0a2010;
+	border: 1px solid #1a4020;
+	border-radius: $radius;
+	padding: 16px;
+	min-height: 140px;
 }
 
 .table-label {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
+	color: #4a8060;
 	text-transform: uppercase;
-	letter-spacing: 0.12em;
-	color: rgba(255, 255, 255, 0.3);
-	margin-bottom: 16px;
+	letter-spacing: 0.08em;
+	margin-bottom: 10px;
 }
 
 .table-cards {
 	display: flex;
+	gap: 12px;
 	flex-wrap: wrap;
-	gap: 20px;
-	justify-content: center;
-	min-height: 100px;
 	align-items: flex-start;
+	min-height: 100px;
 }
 
 .empty-table {
-	color: rgba(255, 255, 255, 0.2);
-	font-size: 1rem;
-	text-align: center;
-	padding: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 100%;
+	min-height: 80px;
+	color: #4a8060;
+	font-style: italic;
+	font-size: 0.9rem;
 }
 
 .card-pair {
 	display: flex;
+	flex-direction: column;
+	gap: 4px;
 	position: relative;
-	gap: 0;
 }
 
-// ─── Cards ───────────────────────────────────────────────────────────────────
+// ─── Cards ────────────────────────────────────────────────────
 .card {
-	background: $card-bg;
-	color: $card-black;
-	border-radius: 10px;
-	font-size: 1.6rem;
-	font-weight: 700;
-	min-width: 58px;
-	height: 82px;
+	width: 52px;
+	height: 76px;
+	border-radius: $card-radius;
+	background: #fff;
+	border: 2px solid #ddd;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-	user-select: none;
+	gap: 2px;
+	color: #1a1a1a;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 	position: relative;
+	user-select: none;
 	transition:
 		transform 0.15s,
 		box-shadow 0.15s;
-	border: 2px solid transparent;
+
+	.card-rank {
+		font-size: 1rem;
+		font-weight: bold;
+		line-height: 1;
+	}
+
+	.card-suit {
+		font-size: 1.1rem;
+		line-height: 1;
+	}
 
 	&.red {
-		color: $card-red;
+		color: $red;
 	}
+
 	&.trump {
-		border-color: $trump-glow;
-		box-shadow: 0 4px 14px rgba(241, 196, 15, 0.3);
+		border-color: $accent;
+		box-shadow:
+			0 0 8px rgba(232, 200, 74, 0.4),
+			0 2px 6px rgba(0, 0, 0, 0.4);
 	}
 
 	&.clickable {
 		cursor: pointer;
+
 		&:hover {
-			transform: translateY(-6px);
-			box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+			transform: translateY(-4px);
+			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 		}
 	}
 
 	&.selected {
-		border-color: $selected-color;
-		transform: translateY(-10px);
-		box-shadow: 0 12px 28px rgba(243, 156, 18, 0.4);
+		transform: translateY(-8px);
+		border-color: $green;
+		box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
 	}
-}
 
-.table-card {
-	&.attack-card {
-		border-color: rgba(231, 76, 60, 0.4);
-		z-index: 1;
-	}
-	&.defend-card {
-		border-color: rgba(41, 128, 185, 0.4);
-		margin-left: -22px;
-		margin-top: -12px;
-		z-index: 2;
-	}
 	&.empty-slot {
-		background: rgba(255, 255, 255, 0.06);
-		color: rgba(255, 255, 255, 0.15);
-		border: 2px dashed rgba(255, 255, 255, 0.15);
+		background: rgba(255, 255, 255, 0.05);
+		border: 2px dashed #2a4060;
+		color: $text-dim;
 		box-shadow: none;
-		margin-left: -22px;
-		margin-top: -12px;
-	}
 
-	&.clickable {
-		cursor: pointer;
-		&:hover {
-			transform: translateY(-4px) scale(1.05);
-			border-color: $defend-color;
-			box-shadow: 0 8px 20px rgba(41, 128, 185, 0.4);
+		.slot-hint {
+			font-size: 1.2rem;
+			animation: pulse 1s ease-in-out infinite;
+		}
+
+		.slot-empty {
+			font-size: 1.2rem;
+			color: $border;
 		}
 	}
+
+	&.open {
+		// Відкрита атака, яку треба відбити
+	}
 }
 
-// ─── Action buttons ───────────────────────────────────────────────────────────
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.6;
+		transform: scale(0.9);
+	}
+}
+
+// Захисна карта йде трохи вбік і вниз — ефект "накрила"
+.defend-card {
+	margin-top: -60px;
+	margin-left: 16px;
+}
+
+// ─── Action Buttons ───────────────────────────────────────────
 .action-btns {
 	display: flex;
-	gap: 12px;
+	gap: 10px;
 	justify-content: center;
+	flex-wrap: wrap;
+
+	.btn {
+		min-width: 130px;
+	}
 }
 
-// ─── Hand ────────────────────────────────────────────────────────────────────
+// ─── My Hand ──────────────────────────────────────────────────
 .my-hand {
-	background: rgba(0, 0, 0, 0.35);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 16px;
-	padding: 20px;
+	background: $surface;
+	border: 1px solid $border;
+	border-radius: $radius;
+	padding: 14px 16px;
 }
 
 .hand-label {
-	font-size: 0.75rem;
+	font-size: 0.8rem;
+	color: $text-dim;
 	text-transform: uppercase;
-	letter-spacing: 0.12em;
-	color: rgba(255, 255, 255, 0.35);
-	margin-bottom: 16px;
+	letter-spacing: 0.06em;
+	margin-bottom: 12px;
 
 	.hint-inline {
-		color: #74b9ff;
+		color: $text-dim;
+		font-weight: normal;
 		text-transform: none;
-		letter-spacing: 0;
-		font-size: 0.8rem;
+	}
+
+	.selected-hint {
+		color: $blue;
 	}
 }
 
 .hand-cards {
 	display: flex;
+	gap: 8px;
 	flex-wrap: wrap;
-	gap: 10px;
-	justify-content: center;
+	align-items: flex-end;
 }
 
 .hand-card {
-	// inherits .card styles
+	// Трохи більші ніж карти на столі — це твої карти
+	width: 56px;
+	height: 82px;
+
+	.card-rank {
+		font-size: 1.1rem;
+	}
+	.card-suit {
+		font-size: 1.2rem;
+	}
 }
 
 .no-cards {
-	color: rgba(255, 255, 255, 0.2);
-	font-size: 0.95rem;
-	text-align: center;
-	padding: 20px;
-	width: 100%;
+	color: $green;
+	font-size: 0.9rem;
+	padding: 10px;
 }
 
-// ─── Game over ───────────────────────────────────────────────────────────────
+// ─── Game Over ────────────────────────────────────────────────
 .game-over {
-	text-align: center;
-	padding: 60px 24px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 16px;
+	padding: 60px 20px;
+	text-align: center;
 
 	.game-over-icon {
 		font-size: 4rem;
-		animation: bounce 1s ease infinite alternate;
 	}
+
 	h2 {
-		font-size: 2rem;
 		margin: 0;
-		color: #ffb74d;
+		font-size: 1.8rem;
+		color: $accent;
 	}
 
 	.winner-text {
-		font-size: 1.4rem;
-		color: #81c784;
-		font-weight: 700;
+		font-size: 1.3rem;
+		color: $green;
 		margin: 0;
 	}
+
 	.loser-text {
-		font-size: 1.4rem;
-		color: #e57373;
-		font-weight: 700;
+		font-size: 1.3rem;
+		color: $red;
 		margin: 0;
 	}
+
 	.loser-sub {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 0.95rem;
-		margin: -8px 0 0;
+		color: $text-dim;
+		margin: 0;
 	}
 }
 
-@keyframes bounce {
-	from {
-		transform: translateY(0);
+.winners-list {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+
+	.label {
+		color: $text-dim;
+		font-size: 0.85rem;
 	}
-	to {
-		transform: translateY(-12px);
+	.winner-name {
+		color: $green;
+		font-weight: bold;
+	}
+}
+
+// ─── Responsive ───────────────────────────────────────────────
+@media (max-width: 600px) {
+	.content {
+		padding: 10px;
+	}
+
+	.top-bar {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.trump-block,
+	.deck-block {
+		min-width: 60px;
+	}
+
+	.card {
+		width: 44px;
+		height: 64px;
+
+		.card-rank {
+			font-size: 0.85rem;
+		}
+		.card-suit {
+			font-size: 0.95rem;
+		}
+	}
+
+	.hand-card {
+		width: 48px;
+		height: 70px;
+	}
+
+	.defend-card {
+		margin-top: -52px;
+		margin-left: 12px;
 	}
 }
